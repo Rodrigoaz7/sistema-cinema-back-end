@@ -1,0 +1,204 @@
+﻿-- Table: public.cidades
+
+-- DROP TABLE public.cidades;
+
+CREATE TABLE public.cidades
+(
+    id bigint NOT NULL,
+    nome character varying(50) COLLATE pg_catalog."default" NOT NULL,
+    sigla_uf character varying(2) COLLATE pg_catalog."default" NOT NULL,
+    CONSTRAINT cidade_pkey PRIMARY KEY (id)
+)
+WITH (
+    OIDS = FALSE
+)
+TABLESPACE pg_default;
+
+ALTER TABLE public.cidades
+    OWNER to postgres;
+
+
+
+
+
+-- Table: public.cinemas
+
+-- DROP TABLE public.cinemas;
+
+CREATE TABLE public.cinemas
+(
+    id bigint NOT NULL,
+    nome character varying(60) COLLATE pg_catalog."default" NOT NULL,
+    rede character varying COLLATE pg_catalog."default",
+    cidade_id bigint NOT NULL,
+    CONSTRAINT cinema_pkey PRIMARY KEY (id),
+    CONSTRAINT fk_cidade FOREIGN KEY (cidade_id)
+        REFERENCES public.cidades (id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION
+)
+WITH (
+    OIDS = FALSE
+)
+TABLESPACE pg_default;
+
+ALTER TABLE public.cinemas
+    OWNER to postgres;
+
+
+
+
+-- Table: public.compra
+
+-- DROP TABLE public.compra;
+
+CREATE TABLE public.compra
+(
+    id bigint NOT NULL,
+    compra_realizada boolean NOT NULL,
+    data_pedido_compra timestamp without time zone,
+    data_compra_realizada timestamp without time zone,
+    usuario_id bigint NOT NULL,
+    sessao_id bigint NOT NULL,
+    CONSTRAINT compra_pkey PRIMARY KEY (id),
+    CONSTRAINT fk_sessao_compra FOREIGN KEY (sessao_id)
+        REFERENCES public.sessoes (id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION,
+    CONSTRAINT fk_usuario_compra FOREIGN KEY (usuario_id)
+        REFERENCES public.usuario (id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION
+)
+WITH (
+    OIDS = FALSE
+)
+TABLESPACE pg_default;
+
+ALTER TABLE public.compra
+    OWNER to postgres;
+
+
+
+
+
+
+
+-- Table: public.filmes
+
+-- DROP TABLE public.filmes;
+
+CREATE TABLE public.filmes
+(
+    id bigint NOT NULL,
+    titulo character varying(100) COLLATE pg_catalog."default" NOT NULL,
+    sinopse text COLLATE pg_catalog."default",
+    classificacao_etaria integer NOT NULL,
+    avaliacao double precision,
+    genero character varying COLLATE pg_catalog."default" NOT NULL,
+    nacional boolean NOT NULL,
+    CONSTRAINT filme_pkey PRIMARY KEY (id)
+)
+WITH (
+    OIDS = FALSE
+)
+TABLESPACE pg_default;
+
+ALTER TABLE public.filmes
+    OWNER to postgres;
+
+
+
+
+
+
+
+
+-- Table: public.poltrona
+
+-- DROP TABLE public.poltrona;
+
+CREATE TABLE public.poltrona
+(
+    id bigint NOT NULL,
+    disponivel boolean NOT NULL,
+    codigo character varying(2) COLLATE pg_catalog."default" NOT NULL,
+    sessao_id bigint NOT NULL,
+    CONSTRAINT poltrona_pkey PRIMARY KEY (id),
+    CONSTRAINT fk_sessao FOREIGN KEY (sessao_id)
+        REFERENCES public.sessoes (id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION
+)
+WITH (
+    OIDS = FALSE
+)
+TABLESPACE pg_default;
+
+ALTER TABLE public.poltrona
+    OWNER to postgres;
+
+
+
+
+
+
+
+-- Table: public.sessoes
+
+-- DROP TABLE public.sessoes;
+
+CREATE TABLE public.sessoes
+(
+    id bigint NOT NULL,
+    horario time without time zone NOT NULL,
+    inicio timestamp without time zone NOT NULL,
+    fim timestamp without time zone NOT NULL,
+    filme_id bigint NOT NULL,
+    cinema_id bigint NOT NULL,
+    CONSTRAINT sessao_pkey PRIMARY KEY (id),
+    CONSTRAINT fk_filme FOREIGN KEY (filme_id)
+        REFERENCES public.filmes (id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION,
+    CONSTRAINT fk_sessao_cinema FOREIGN KEY (cinema_id)
+        REFERENCES public.cinemas (id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION
+)
+WITH (
+    OIDS = FALSE
+)
+TABLESPACE pg_default;
+
+ALTER TABLE public.sessoes
+    OWNER to postgres;
+
+
+
+
+
+
+
+-- Table: public.usuario
+
+-- DROP TABLE public.usuario;
+
+CREATE TABLE public.usuario
+(
+    id bigint NOT NULL,
+    nickname character varying(20) COLLATE pg_catalog."default" NOT NULL,
+    email character varying(20) COLLATE pg_catalog."default" NOT NULL,
+    senha character varying COLLATE pg_catalog."default" NOT NULL,
+    cpf character varying COLLATE pg_catalog."default" NOT NULL,
+    CONSTRAINT usuario_pkey PRIMARY KEY (id),
+    CONSTRAINT usuario_nickname_email_cpf_key UNIQUE (nickname, email, cpf)
+
+)
+WITH (
+    OIDS = FALSE
+)
+TABLESPACE pg_default;
+
+ALTER TABLE public.usuario
+    OWNER to postgres;
